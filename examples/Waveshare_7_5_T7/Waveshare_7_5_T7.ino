@@ -1,7 +1,8 @@
 /* ESP32 Weather Display using an EPD 7.5" 800x480 Display, obtains data from Open Weather Map, decodes and then displays it.
-//Modified by AGR (7/23/23), including: 
-// with % of precip graph added bt AGR
-// with inches Hg x 100 graph by AGR
+  Modified by AGR (7/23/23), including:
+  with % of precip (“POP”) graph added by AGR; be sure to edit “lang.h” to fix graph titles
+  with inches Hg x 100 graph by AGR
+  added a code line to set Cpu to 80 mHz (from native 240 mHz) to save ~50% CPY energy usage
   ####################################################################################################################################
   This software, the ideas and concepts is Copyright (c) David Bird 2018. All rights to this software are reserved.
 
@@ -24,7 +25,7 @@
 #include <ArduinoJson.h>              // https://github.com/bblanchon/ArduinoJson needs version v6 or above
 #include <WiFi.h>                     // Built-in
 #include "time.h"                     // Built-in
-#include <SPI.h>                      // Built-in 
+#include <SPI.h>                      // Built-in
 #define  ENABLE_GxEPD2_display 1
 #include <GxEPD2_BW.h>
 //#include <GxEPD2_3C.h>
@@ -56,8 +57,8 @@ static const uint8_t EPD_MOSI = 23; // to EPD DIN
 // Connections for e.g. Waveshare ESP32 e-Paper Driver Board
 //static const uint8_t EPD_BUSY = 25;
 //static const uint8_t EPD_CS   = 15;
-//static const uint8_t EPD_RST  = 26; 
-//static const uint8_t EPD_DC   = 27; 
+//static const uint8_t EPD_RST  = 26;
+//static const uint8_t EPD_DC   = 27;
 //static const uint8_t EPD_SCK  = 13;
 //static const uint8_t EPD_MISO = 12; // Master-In Slave-Out not used, as no data from display
 //static const uint8_t EPD_MOSI = 14;
@@ -76,7 +77,7 @@ U8G2_FOR_ADAFRUIT_GFX u8g2Fonts;  // Select u8g2 font from here: https://github.
 // u8g2_font_helvB24_tf
 
 //################  VERSION  ###########################################
-String version = "16.11  Tyler's weather";    // Programme version, see change log at end
+String version = "16.11a    Tyler's Local Weather";    // Programme version, see change log at end
 //################ VARIABLES ###########################################
 
 boolean LargeIcon = true, SmallIcon = false;
@@ -469,7 +470,7 @@ uint8_t StartWiFi() {
   IPAddress dns(8, 8, 8, 8); // Google DNS
   WiFi.disconnect();
   WiFi.mode(WIFI_STA); // switch off AP
-  WiFi.setAutoConnect(true);
+  // WiFi.setAutoConnect(true);  / TAR this doesnt seem needed/supported anymore
   WiFi.setAutoReconnect(true);
   WiFi.begin(ssid, password);
   unsigned long start = millis();
@@ -895,7 +896,7 @@ void DrawGraph(int x_pos, int y_pos, int gwidth, int gheight, float Y1Min, float
     if (barchart_mode) {
       x2 = x_pos + gx * (gwidth / readings) + 2;
       display.fillRect(x2, y2, (gwidth / readings) - 2, y_pos + gheight - y2 + 2, GxEPD_BLACK);
-    } 
+    }
     else
     {
       x2 = x_pos + gx * gwidth / (readings - 1) + 1; // max_readings is the global variable that sets the maximum data that can be plotted
@@ -923,7 +924,7 @@ void DrawGraph(int x_pos, int y_pos, int gwidth, int gheight, float Y1Min, float
       }
     }
     else  // Draw right hand y-axis labels
-    {   
+    {
       if ((Y1Max - (float)(Y1Max - Y1Min) / y_minor_axis * spacing) < 5 || title == TXT_PRESSURE_IN) {
         drawString(x_pos + gwidth + 5, y_pos + gheight * spacing / y_minor_axis - 5, String((Y1Max - (float)(Y1Max - Y1Min) / y_minor_axis * spacing + 0.01), 1), LEFT);
       }
@@ -933,8 +934,8 @@ void DrawGraph(int x_pos, int y_pos, int gwidth, int gheight, float Y1Min, float
           drawString(x_pos + gwidth + 5, y_pos + gheight * spacing / y_minor_axis - 5, String((Y1Max - (float)(Y1Max - Y1Min) / y_minor_axis * spacing + 0.01), 1), LEFT);
         else
           drawString(x_pos + gwidth + 5, y_pos + gheight * spacing / y_minor_axis - 5, String((Y1Max - (float)(Y1Max - Y1Min) / y_minor_axis * spacing + 0.01), 0), LEFT);
-      }    
-    }   
+      }
+    }
   }
   //Draw the X-axis scale
   for (int i = 0; i <= 2; i++) {
@@ -1054,21 +1055,24 @@ void InitialiseDisplay() {
 
   Version 16.6 changed GxEPD2 initialisation from 115200 to 0
    1.  Display.init(115200); becomes display.init(0); to stop blank screen following update to GxEPD2
-   
+
   Version 16.7 changed u8g2 fonts selection
    1.  Omitted 'FONT(' and added _tf to font names either Regular (R) or Bold (B)
-  
+
   Version 16.8
    1. Added extra 20-secs of sleep to allow for slow ESP32 RTC timers
-   
+
   Version 16.9
    1. Added probability of precipitation display e.g. 17%
 
   Version 16.10
    1. Updated display inittialisation for 7.5" T7 display type, which iss now the standard 7.5" display type.
-  
+
   Version 16.11
    1. Adjusted graph drawing for negative numbers
-   2. Correct offset error for precipitation 
- 
+   2. Correct offset error for precipitation
+
+   AGR's Version 16.11a
+   1.  Swapped the API call method from using city and country to using latitude and longitude (edited owm_cedentials.h and common.h [in the SRC folder))
+
 */

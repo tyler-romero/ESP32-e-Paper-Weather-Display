@@ -11,17 +11,17 @@ const String TXT_HUMIDITY_PERCENT = "Humidity (%)";
 
 // Pressure
 const String TXT_PRESSURE         = "Pressure";
-const String TXT_PRESSURE_HPA     = "Pressure (hPa)";
-const String TXT_PRESSURE_IN      = "Pressure (in * 100)";
+const String TXT_PRESSURE_HPA     = "Pressure (mm Hg)";
+const String TXT_PRESSURE_IN      = "Pressure (inches x 100)";
 const String TXT_PRESSURE_STEADY  = "Steady";
 const String TXT_PRESSURE_RISING  = "Rising";
 const String TXT_PRESSURE_FALLING = "Falling";
 
 //RainFall / SnowFall
 const String TXT_RAINFALL_MM = "Rainfall (mm)";
-const String TXT_RAINFALL_IN = "Rain (in \\ % chance)";
+const String TXT_RAINFALL_IN = "Rain (inches / % chance)";
 const String TXT_SNOWFALL_MM = "Snowfall (mm)";
-const String TXT_SNOWFALL_IN = "Snowfall (in \\ % chance)";
+const String TXT_SNOWFALL_IN = "Snow (inches / % chance)";
 const String TXT_PRECIPITATION_SOON = "Prec.";
 
 
@@ -69,4 +69,3 @@ const char* weekday_D[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 
 //Month
 const char* month_M[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
